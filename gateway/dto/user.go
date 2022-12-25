@@ -1,4 +1,4 @@
-package models
+package dto
 
 import "time"
 
@@ -22,8 +22,4 @@ type RegisterUser struct {
 type LoginUser struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
-}
-
-type Token struct {
-	Token string `json:"token"`
 }

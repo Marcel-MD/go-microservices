@@ -1,0 +1,35 @@
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: users
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres-db:/data/postgres
+
+  user:
+    build:
+      context: ./user
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres
+    networks:
+      - default
+    ports:
+      - "8081:8081"
+
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    depends_on:
+      - user
+    networks:
+      - default
+    ports:
+      - "8080:8080"
+
+volumes:
+  postgres-db:

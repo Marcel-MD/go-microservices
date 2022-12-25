@@ -3,7 +3,7 @@ package main
 import (
 	"gateway/domain"
 	"gateway/infrastructure/services"
-	"gateway/presentation"
+	"gateway/presentation/handlers"
 
 	"github.com/caarlos0/env/v6"
 	"github.com/joho/godotenv"
@@ -24,7 +24,7 @@ func main() {
 
 	service := services.NewUserService(cfg)
 
-	s := presentation.NewServer(cfg, service)
+	s := handlers.NewServer(cfg, service)
 
 	if err := s.Run(); err != nil {
 		log.Fatal().Err(err).Msg("Failed to run server.")

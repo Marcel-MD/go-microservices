@@ -1,4 +1,4 @@
-package presentation
+package handlers
 
 import (
 	"gateway/domain"
@@ -21,11 +21,15 @@ func NewServer(cfg domain.Config, userService services.UserService) Server {
 
 	r := gin.Default()
 
-	return &server{
+	s := server{
 		cfg:         cfg,
 		router:      r,
 		userService: userService,
 	}
+
+	s.routeUserHandler()
+
+	return &s
 }
 
 func (s *server) Run() error {
