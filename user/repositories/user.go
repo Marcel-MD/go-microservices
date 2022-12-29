@@ -1,8 +1,10 @@
 package repositories
 
 import (
+	"sync"
 	"user/domain"
 
+	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
 )
 
@@ -20,10 +22,19 @@ type userRepository struct {
 	DB *gorm.DB
 }
 
-func NewUserRepository(db *gorm.DB) IUserRepository {
-	return &userRepository{
-		DB: db,
-	}
+var (
+	userOnce sync.Once
+	userRepo IUserRepository
+)
+
+func GetUserRepository() IUserRepository {
+	userOnce.Do(func() {
+		log.Info().Msg("Initializing user repository")
+		userRepo = &userRepository{
+			DB: GetDB(),
+		}
+	})
+	return userRepo
 }
 
 func (r *userRepository) FindAll() []domain.User {

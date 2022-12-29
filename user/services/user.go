@@ -1,9 +1,11 @@
-package application
+package services
 
 import (
 	"errors"
+	"sync"
 	"user/auth"
-	"user/infrastructure/repositories"
+	"user/config"
+	"user/repositories"
 
 	"user/domain"
 
@@ -20,14 +22,23 @@ type IUserService interface {
 
 type userService struct {
 	repository repositories.IUserRepository
-	cfg        domain.Config
+	cfg        config.Config
 }
 
-func NewUserService(userRepository repositories.IUserRepository, cfg domain.Config) IUserService {
-	return &userService{
-		repository: userRepository,
-		cfg:        cfg,
-	}
+var userOnce sync.Once
+var userSrv IUserService
+
+func GetUserService() IUserService {
+	userOnce.Do(func() {
+		log.Info().Msg("Initializing user service")
+
+		userSrv = &userService{
+			repository: repositories.GetUserRepository(),
+			cfg:        config.GetConfig(),
+		}
+	})
+
+	return userSrv
 }
 
 func (s *userService) FindAll() []domain.User {

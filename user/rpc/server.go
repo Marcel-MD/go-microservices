@@ -1,22 +1,46 @@
-package presentation
+package rpc
 
 import (
 	"context"
-	"user/application"
+	"net"
+	"user/config"
 	"user/domain"
 	"user/pb"
+	"user/services"
 
 	"github.com/golang/protobuf/ptypes/empty"
+	"github.com/rs/zerolog/log"
+	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-type server struct {
-	pb.UserServiceServer
-	service application.IUserService
+func Run() {
+	log.Info().Msg("Initializing gRPC server")
+
+	cfg := config.GetConfig()
+
+	server := &server{
+		service: services.GetUserService(),
+	}
+
+	listener, err := net.Listen("tcp", cfg.Port)
+	if err != nil {
+		log.Fatal().Err(err).Msg("Failed to listen.")
+	}
+
+	s := grpc.NewServer()
+	pb.RegisterUserServiceServer(s, server)
+
+	log.Info().Msg("Starting server")
+
+	if err := s.Serve(listener); err != nil {
+		log.Fatal().Err(err).Msg("Failed to serve.")
+	}
 }
 
-func NewServer(service application.IUserService) pb.UserServiceServer {
-	return &server{service: service}
+type server struct {
+	pb.UserServiceServer
+	service services.IUserService
 }
 
 func (s *server) Register(ctx context.Context, in *pb.RegisterRequest) (*pb.UserId, error) {
