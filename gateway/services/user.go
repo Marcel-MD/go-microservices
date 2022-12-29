@@ -2,9 +2,10 @@ package services
 
 import (
 	"context"
-	"gateway/domain"
+	"gateway/config"
 	"gateway/dto"
 	"gateway/pb"
+	"sync"
 
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
@@ -12,7 +13,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-type UserService interface {
+type IUserService interface {
 	Close()
 	Get(ctx context.Context, id string) (dto.User, error)
 	List(ctx context.Context) ([]dto.User, error)
@@ -25,18 +26,29 @@ type userService struct {
 	client pb.UserServiceClient
 }
 
-func NewUserService(cfg domain.Config) UserService {
-	conn, err := grpc.Dial(cfg.UserServiceUrl, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Fatal().Err(err).Msg("Failed to connect to user service")
-	}
+var (
+	userOnce sync.Once
+	userSrv  IUserService
+)
 
-	client := pb.NewUserServiceClient(conn)
+func GetUserService() IUserService {
+	userOnce.Do(func() {
+		cfg := config.GetConfig()
 
-	return &userService{
-		conn:   conn,
-		client: client,
-	}
+		conn, err := grpc.Dial(cfg.UserServiceUrl, grpc.WithTransportCredentials(insecure.NewCredentials()))
+		if err != nil {
+			log.Fatal().Err(err).Msg("Failed to connect to user service")
+		}
+
+		client := pb.NewUserServiceClient(conn)
+
+		userSrv = &userService{
+			conn:   conn,
+			client: client,
+		}
+	})
+
+	return userSrv
 }
 
 func (s *userService) Close() {

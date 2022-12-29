@@ -1,32 +1,12 @@
 package main
 
 import (
-	"gateway/domain"
-	"gateway/infrastructure/services"
-	"gateway/presentation/handlers"
-
-	"github.com/caarlos0/env/v6"
-	"github.com/joho/godotenv"
-	"github.com/rs/zerolog/log"
+	"gateway/http"
 )
 
 func main() {
 
-	err := godotenv.Load()
-	if err != nil {
-		log.Warn().Err(err).Msg("Failed to load .env file.")
-	}
+	srv := http.GetServer()
+	srv.Run()
 
-	cfg := domain.Config{}
-	if err := env.Parse(&cfg); err != nil {
-		log.Fatal().Err(err).Msg("Failed to parse environment variables.")
-	}
-
-	service := services.NewUserService(cfg)
-
-	s := handlers.NewServer(cfg, service)
-
-	if err := s.Run(); err != nil {
-		log.Fatal().Err(err).Msg("Failed to run server.")
-	}
 }

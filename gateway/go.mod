@@ -3,7 +3,7 @@ module gateway
 go 1.19
 
 require (
-	github.com/caarlos0/env/v6 v6.10.1
+	github.com/caarlos0/env v3.5.0+incompatible
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.8.1
 	github.com/golang/protobuf v1.5.2

@@ -2,33 +2,39 @@ package handlers
 
 import (
 	"gateway/dto"
-	"gateway/infrastructure/services"
-	"gateway/presentation/middleware"
+	"gateway/services"
 	"net/http"
+	"sync"
 
 	"github.com/gin-gonic/gin"
 )
 
-func (s server) routeUserHandler() {
-	h := &userHandler{
-		service: s.userService,
-	}
-
-	r := s.router.Group("/users")
-	r.POST("/register", h.register)
-	r.POST("/login", h.login)
-	r.GET("/", h.listAll)
-	r.GET("/:id", h.getById)
-
-	p := r.Use(middleware.JwtAuth(s.cfg.ApiSecret))
-	p.GET("/current", h.current)
+type IUserHandler interface {
+	Register(c *gin.Context)
+	Login(c *gin.Context)
+	GetAll(c *gin.Context)
+	GetById(c *gin.Context)
+	Current(c *gin.Context)
 }
 
 type userHandler struct {
-	service services.UserService
+	service services.IUserService
 }
 
-func (h *userHandler) register(c *gin.Context) {
+var userOnce sync.Once
+var userHnd IUserHandler
+
+func GetUserHandler() IUserHandler {
+	userOnce.Do(func() {
+		userHnd = &userHandler{
+			service: services.GetUserService(),
+		}
+	})
+
+	return userHnd
+}
+
+func (h *userHandler) Register(c *gin.Context) {
 
 	var dto dto.RegisterUser
 	err := c.ShouldBindJSON(&dto)
@@ -46,7 +52,7 @@ func (h *userHandler) register(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-func (h *userHandler) login(c *gin.Context) {
+func (h *userHandler) Login(c *gin.Context) {
 
 	var dto dto.LoginUser
 	err := c.ShouldBindJSON(&dto)
@@ -64,7 +70,7 @@ func (h *userHandler) login(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"token": token})
 }
 
-func (h *userHandler) getById(c *gin.Context) {
+func (h *userHandler) GetById(c *gin.Context) {
 	id := c.Param("id")
 
 	user, err := h.service.Get(c, id)
@@ -76,7 +82,7 @@ func (h *userHandler) getById(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-func (h *userHandler) listAll(c *gin.Context) {
+func (h *userHandler) GetAll(c *gin.Context) {
 	users, err := h.service.List(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -86,7 +92,7 @@ func (h *userHandler) listAll(c *gin.Context) {
 	c.JSON(http.StatusOK, users)
 }
 
-func (h *userHandler) current(c *gin.Context) {
+func (h *userHandler) Current(c *gin.Context) {
 	id := c.GetString("user_id")
 
 	user, err := h.service.Get(c, id)
