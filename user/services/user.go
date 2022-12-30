@@ -7,16 +7,16 @@ import (
 	"user/config"
 	"user/repositories"
 
-	"user/domain"
+	"user/models"
 
 	"github.com/rs/zerolog/log"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type IUserService interface {
-	FindAll() []domain.User
-	FindOne(id string) (domain.User, error)
-	Register(user domain.User) (domain.User, error)
+	FindAll() []models.User
+	FindOne(id string) (models.User, error)
+	Register(user models.User) (models.User, error)
 	Login(email, password string) (string, error)
 }
 
@@ -41,13 +41,13 @@ func GetUserService() IUserService {
 	return userSrv
 }
 
-func (s *userService) FindAll() []domain.User {
+func (s *userService) FindAll() []models.User {
 	log.Debug().Msg("Finding all users")
 
 	return s.repository.FindAll()
 }
 
-func (s *userService) FindOne(id string) (domain.User, error) {
+func (s *userService) FindOne(id string) (models.User, error) {
 	log.Debug().Str("id", id).Msg("Finding user")
 
 	user, err := s.repository.FindById(id)
@@ -58,7 +58,7 @@ func (s *userService) FindOne(id string) (domain.User, error) {
 	return user, nil
 }
 
-func (s *userService) Register(user domain.User) (domain.User, error) {
+func (s *userService) Register(user models.User) (models.User, error) {
 	log.Debug().Msg("Registering user")
 
 	existingUser, err := s.repository.FindByEmail(user.Email)

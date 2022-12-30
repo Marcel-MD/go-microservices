@@ -31,7 +31,7 @@ func GetServer() IServer {
 
 		e := gin.Default()
 
-		e.Use(middleware.CORS("*"))
+		e.Use(middleware.CORS(cfg.AllowOrigin))
 
 		s := &server{
 			cfg:    cfg,

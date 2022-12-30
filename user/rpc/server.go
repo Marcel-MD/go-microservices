@@ -4,7 +4,7 @@ import (
 	"context"
 	"net"
 	"user/config"
-	"user/domain"
+	"user/models"
 	"user/pb"
 	"user/services"
 
@@ -45,7 +45,7 @@ type server struct {
 
 func (s *server) Register(ctx context.Context, in *pb.RegisterRequest) (*pb.UserId, error) {
 
-	user := domain.User{
+	user := models.User{
 		Email:     in.Email,
 		FirstName: in.FirstName,
 		LastName:  in.LastName,

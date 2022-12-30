@@ -2,20 +2,20 @@ package repositories
 
 import (
 	"sync"
-	"user/domain"
+	"user/models"
 
 	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
 )
 
 type IUserRepository interface {
-	FindAll() []domain.User
-	FindById(id string) (domain.User, error)
-	FindByEmail(email string) (domain.User, error)
-	SearchByEmail(email string) []domain.User
-	Create(user *domain.User) error
-	Update(user *domain.User) error
-	Delete(user *domain.User) error
+	FindAll() []models.User
+	FindById(id string) (models.User, error)
+	FindByEmail(email string) (models.User, error)
+	SearchByEmail(email string) []models.User
+	Create(user *models.User) error
+	Update(user *models.User) error
+	Delete(user *models.User) error
 }
 
 type userRepository struct {
@@ -37,40 +37,40 @@ func GetUserRepository() IUserRepository {
 	return userRepo
 }
 
-func (r *userRepository) FindAll() []domain.User {
-	var users []domain.User
+func (r *userRepository) FindAll() []models.User {
+	var users []models.User
 	r.DB.Find(&users)
 	return users
 }
 
-func (r *userRepository) FindById(id string) (domain.User, error) {
-	var user domain.User
+func (r *userRepository) FindById(id string) (models.User, error) {
+	var user models.User
 	err := r.DB.First(&user, "id = ?", id).Error
 
 	return user, err
 }
 
-func (r *userRepository) SearchByEmail(email string) []domain.User {
-	var users []domain.User
+func (r *userRepository) SearchByEmail(email string) []models.User {
+	var users []models.User
 	r.DB.Where("email LIKE ?", "%"+email+"%").Find(&users)
 	return users
 }
 
-func (r *userRepository) FindByEmail(email string) (domain.User, error) {
-	var user domain.User
+func (r *userRepository) FindByEmail(email string) (models.User, error) {
+	var user models.User
 	err := r.DB.First(&user, "email = ?", email).Error
 
 	return user, err
 }
 
-func (r *userRepository) Create(user *domain.User) error {
+func (r *userRepository) Create(user *models.User) error {
 	return r.DB.Create(user).Error
 }
 
-func (r *userRepository) Update(user *domain.User) error {
+func (r *userRepository) Update(user *models.User) error {
 	return r.DB.Save(user).Error
 }
 
-func (r *userRepository) Delete(user *domain.User) error {
+func (r *userRepository) Delete(user *models.User) error {
 	return r.DB.Delete(user).Error
 }

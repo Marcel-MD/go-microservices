@@ -3,7 +3,7 @@ package repositories
 import (
 	"sync"
 	"user/config"
-	"user/domain"
+	"user/models"
 
 	"github.com/rs/zerolog/log"
 	"gorm.io/driver/postgres"
@@ -25,7 +25,7 @@ func GetDB() *gorm.DB {
 			log.Fatal().Err(err).Msg("Failed to connect to database")
 		}
 
-		db.AutoMigrate(&domain.User{})
+		db.AutoMigrate(&models.User{})
 
 		database = db
 	})
