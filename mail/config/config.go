@@ -2,7 +2,6 @@ package config
 
 import (
 	"sync"
-	"time"
 
 	"github.com/caarlos0/env"
 	"github.com/joho/godotenv"
@@ -15,9 +14,6 @@ type Config struct {
 	KafkaUrl       string `env:"KAFKA_URL" envDefault:"kafka:9092"`
 	KafkaTopic     string `env:"KAFKA_TOPIC" envDefault:"mails"`
 	KafkaPartition int    `env:"KAFKA_PARTITION" envDefault:"0"`
-
-	ReadDeadline time.Duration `env:"READ_DEADLINE" envDefault:"5s"`
-	// WriteDeadline time.Duration `env:"WRITE_DEADLINE" envDefault:"5s"`
 
 	SmtpHost     string `env:"SMTP_HOST" envDefault:"smtp.gmail.com"`
 	SmtpPort     string `env:"SMTP_PORT" envDefault:"587"`
