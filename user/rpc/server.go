@@ -3,6 +3,7 @@ package rpc
 import (
 	"context"
 	"net"
+	"sync"
 	"user/config"
 	"user/models"
 	"user/pb"
@@ -14,28 +15,33 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func Run() {
-	log.Info().Msg("Initializing gRPC server")
+var once sync.Once
+var srv *grpc.Server
+var listener net.Listener
 
-	cfg := config.GetConfig()
+func GetServer() (*grpc.Server, net.Listener) {
+	once.Do(func() {
+		log.Info().Msg("Initializing gRPC server")
 
-	server := &server{
-		service: services.GetUserService(),
-	}
+		cfg := config.GetConfig()
 
-	listener, err := net.Listen("tcp", cfg.Port)
-	if err != nil {
-		log.Fatal().Err(err).Msg("Failed to listen.")
-	}
+		server := &server{
+			service: services.GetUserService(),
+		}
 
-	s := grpc.NewServer()
-	pb.RegisterUserServiceServer(s, server)
+		l, err := net.Listen("tcp", cfg.Port)
+		if err != nil {
+			log.Fatal().Err(err).Msg("Failed to listen.")
+		}
 
-	log.Info().Msg("Starting server")
+		s := grpc.NewServer()
+		pb.RegisterUserServiceServer(s, server)
 
-	if err := s.Serve(listener); err != nil {
-		log.Fatal().Err(err).Msg("Failed to serve.")
-	}
+		listener = l
+		srv = s
+	})
+
+	return srv, listener
 }
 
 type server struct {

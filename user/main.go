@@ -1,10 +1,40 @@
 package main
 
 import (
+	"os"
+	"os/signal"
+	"syscall"
+	"user/repositories"
 	"user/rpc"
+
+	"github.com/rs/zerolog/log"
 )
 
 func main() {
 
-	rpc.Run()
+	srv, listener := rpc.GetServer()
+
+	go func() {
+		if err := srv.Serve(listener); err != nil {
+			log.Fatal().Err(err).Msg("Server failed to start")
+		}
+	}()
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, syscall.SIGSEGV)
+
+	<-quit
+	log.Warn().Msg("Shutting down server...")
+
+	srv.GracefulStop()
+
+	db := repositories.GetDB()
+	dbSql, err := db.DB()
+	if err != nil {
+		log.Fatal().Err(err).Msg("Failed to get database connection")
+	}
+
+	dbSql.Close()
+
+	log.Info().Msg("Server exiting")
 }

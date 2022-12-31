@@ -4,25 +4,17 @@ import (
 	"gateway/config"
 	"gateway/http/handlers"
 	"gateway/http/middleware"
+	"net/http"
 	"sync"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 )
 
-type IServer interface {
-	Run()
-}
-
-type server struct {
-	cfg    config.Config
-	engine *gin.Engine
-}
-
 var once sync.Once
-var srv IServer
+var srv *http.Server
 
-func GetServer() IServer {
+func GetServer() *http.Server {
 	once.Do(func() {
 
 		log.Info().Msg("Initializing server")
@@ -33,12 +25,14 @@ func GetServer() IServer {
 
 		e.Use(middleware.CORS(cfg.AllowOrigin))
 
-		s := &server{
-			cfg:    cfg,
-			engine: e,
-		}
+		r := e.Group("/api")
 
-		s.routeUserHandler()
+		routeUserHandler(r, cfg)
+
+		s := &http.Server{
+			Addr:    cfg.Port,
+			Handler: e,
+		}
 
 		srv = s
 	})
@@ -46,21 +40,15 @@ func GetServer() IServer {
 	return srv
 }
 
-func (s *server) Run() {
-	log.Info().Msg("Running server on port " + s.cfg.Port)
-
-	s.engine.Run(s.cfg.Port)
-}
-
-func (s *server) routeUserHandler() {
+func routeUserHandler(router *gin.RouterGroup, cfg config.Config) {
 	h := handlers.GetUserHandler()
 
-	r := s.engine.Group("/users")
+	r := router.Group("/users")
 	r.POST("/register", h.Register)
 	r.POST("/login", h.Login)
 	r.GET("/", h.GetAll)
 	r.GET("/:id", h.GetById)
 
-	p := r.Use(middleware.JwtAuth(s.cfg.ApiSecret))
+	p := r.Use(middleware.JwtAuth(cfg.ApiSecret))
 	p.GET("/current", h.Current)
 }

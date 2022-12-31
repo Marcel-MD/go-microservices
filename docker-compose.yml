@@ -1,5 +1,4 @@
 services:
-
   zookeeper:
     image: docker.io/bitnami/zookeeper:latest
     ports:
@@ -26,7 +25,7 @@ services:
     depends_on:
       - zookeeper
 
-  user:
+  mail:
     build:
       context: ./mail
       dockerfile: Dockerfile
@@ -43,7 +42,7 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: users
     ports:
-      - 5432:5432
+      - "5432:5432"
     volumes:
       - postgres-db:/data/postgres
 
