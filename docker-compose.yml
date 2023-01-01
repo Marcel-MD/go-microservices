@@ -1,38 +1,19 @@
 services:
-  zookeeper:
-    image: docker.io/bitnami/zookeeper:latest
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
     ports:
-      - "2181:2181"
+      - 5672:5672
+      - 15672:15672
     volumes:
-      - "zookeeper_data:/bitnami"
-    environment:
-      - ZOO_ENABLE_AUTH=yes
-      - ZOO_SERVER_USERS=kafka
-      - ZOO_SERVER_PASSWORDS=kafka_password
-
-  kafka:
-    image: docker.io/bitnami/kafka:latest
-    ports:
-      - "9092:9092"
-    volumes:
-      - "kafka_data:/bitnami"
-    environment:
-      - KAFKA_ZOOKEEPER_USER=kafka
-      - KAFKA_ZOOKEEPER_PASSWORD=kafka_password
-      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
-      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
-      - ALLOW_PLAINTEXT_LISTENER=yes
-    depends_on:
-      - zookeeper
+      - rabbitmq_data:/var/lib/rabbitmq
+      - rabbitmq_log:/var/log/rabbitmq
 
   mail:
     build:
       context: ./mail
       dockerfile: Dockerfile
     depends_on:
-      - kafka
-    networks:
-      - default
+      - rabbitmq
     ports:
       - "8082:8082"
 
@@ -52,8 +33,7 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - postgres
-    networks:
-      - default
+      - rabbitmq
     ports:
       - "8081:8081"
 
@@ -63,12 +43,10 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - user
-    networks:
-      - default
     ports:
       - "8080:8080"
 
 volumes:
-  zookeeper_data:
-  kafka_data:
+  rabbitmq_data:
+  rabbitmq_log:
   postgres-db:

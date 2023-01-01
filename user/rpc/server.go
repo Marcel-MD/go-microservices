@@ -26,7 +26,8 @@ func GetServer() (*grpc.Server, net.Listener) {
 		cfg := config.GetConfig()
 
 		server := &server{
-			service: services.GetUserService(),
+			userService: services.GetUserService(),
+			mailService: services.GetMailService(),
 		}
 
 		l, err := net.Listen("tcp", cfg.Port)
@@ -46,7 +47,8 @@ func GetServer() (*grpc.Server, net.Listener) {
 
 type server struct {
 	pb.UserServiceServer
-	service services.IUserService
+	userService services.IUserService
+	mailService services.IMailService
 }
 
 func (s *server) Register(ctx context.Context, in *pb.RegisterRequest) (*pb.UserId, error) {
@@ -58,7 +60,7 @@ func (s *server) Register(ctx context.Context, in *pb.RegisterRequest) (*pb.User
 		Password:  in.Password,
 	}
 
-	createdUser, err := s.service.Register(user)
+	createdUser, err := s.userService.Register(user)
 	if err != nil {
 		return &pb.UserId{}, err
 	}
@@ -68,7 +70,7 @@ func (s *server) Register(ctx context.Context, in *pb.RegisterRequest) (*pb.User
 
 func (s *server) Login(ctx context.Context, in *pb.LoginRequest) (*pb.Token, error) {
 
-	token, err := s.service.Login(in.Email, in.Password)
+	token, err := s.userService.Login(in.Email, in.Password)
 	if err != nil {
 		return &pb.Token{}, err
 	}
@@ -78,7 +80,7 @@ func (s *server) Login(ctx context.Context, in *pb.LoginRequest) (*pb.Token, err
 
 func (s *server) List(ctx context.Context, in *empty.Empty) (*pb.UserList, error) {
 
-	users := s.service.FindAll()
+	users := s.userService.FindAll()
 
 	var userList []*pb.User
 	for _, user := range users {
@@ -97,7 +99,7 @@ func (s *server) List(ctx context.Context, in *empty.Empty) (*pb.UserList, error
 
 func (s *server) Get(ctx context.Context, in *pb.UserId) (*pb.User, error) {
 
-	user, err := s.service.FindOne(in.Id)
+	user, err := s.userService.FindOne(in.Id)
 	if err != nil {
 		return &pb.User{}, err
 	}

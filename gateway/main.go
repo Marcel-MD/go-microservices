@@ -36,7 +36,9 @@ func main() {
 	}
 
 	us := services.GetUserService()
-	us.Close()
+	if err := us.Close(); err != nil {
+		log.Fatal().Err(err).Msg("Failed to close user service")
+	}
 
 	<-ctx.Done()
 

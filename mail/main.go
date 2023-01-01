@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"mail/kafka"
 	"os"
 	"os/signal"
 	"syscall"
@@ -11,10 +10,7 @@ import (
 )
 
 func main() {
-	reader := kafka.GetReader()
-	ctx, cancel := context.WithCancel(context.Background())
-
-	go reader.ReadMessages(ctx)
+	_, cancel := context.WithCancel(context.Background())
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, syscall.SIGSEGV)

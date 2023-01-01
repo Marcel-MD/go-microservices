@@ -14,7 +14,7 @@ import (
 )
 
 type IUserService interface {
-	Close()
+	Close() error
 	Get(ctx context.Context, id string) (dto.User, error)
 	List(ctx context.Context) ([]dto.User, error)
 	Register(ctx context.Context, user dto.RegisterUser) (string, error)
@@ -51,8 +51,8 @@ func GetUserService() IUserService {
 	return userSrv
 }
 
-func (s *userService) Close() {
-	s.conn.Close()
+func (s *userService) Close() error {
+	return s.conn.Close()
 }
 
 func (s *userService) Get(ctx context.Context, id string) (dto.User, error) {

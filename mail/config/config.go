@@ -11,10 +11,6 @@ import (
 type Config struct {
 	Port string `env:"PORT" envDefault:":8082"`
 
-	KafkaUrl       string `env:"KAFKA_URL" envDefault:"kafka:9092"`
-	KafkaTopic     string `env:"KAFKA_TOPIC" envDefault:"mails"`
-	KafkaPartition int    `env:"KAFKA_PARTITION" envDefault:"0"`
-
 	SmtpHost     string `env:"SMTP_HOST" envDefault:"smtp.gmail.com"`
 	SmtpPort     string `env:"SMTP_PORT" envDefault:"587"`
 	SmtpEmail    string `env:"SMTP_EMAIL" envDefault:""`
