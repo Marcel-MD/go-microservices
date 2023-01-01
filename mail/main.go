@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"mail/rabbitmq"
 	"os"
 	"os/signal"
 	"syscall"
@@ -10,7 +11,10 @@ import (
 )
 
 func main() {
-	_, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(context.Background())
+
+	receiver := rabbitmq.GetReceiver()
+	go receiver.Listen(ctx)
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, syscall.SIGSEGV)
@@ -19,6 +23,11 @@ func main() {
 	log.Warn().Msg("Shutting down server...")
 
 	cancel()
+
+	err := receiver.Close()
+	if err != nil {
+		log.Fatal().Err(err).Msg("Failed to close receiver")
+	}
 
 	log.Info().Msg("Server exiting")
 }

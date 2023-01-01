@@ -65,6 +65,8 @@ func (s *server) Register(ctx context.Context, in *pb.RegisterRequest) (*pb.User
 		return &pb.UserId{}, err
 	}
 
+	s.mailService.SendWelcomeMail(createdUser)
+
 	return &pb.UserId{Id: createdUser.Id}, nil
 }
 

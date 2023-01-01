@@ -11,6 +11,8 @@ import (
 type Config struct {
 	Port string `env:"PORT" envDefault:":8082"`
 
+	RabbitMQUrl string `env:"RABBITMQ_URL" envDefault:"amqp://guest:guest@rabbitmq:5672/"`
+
 	SmtpHost     string `env:"SMTP_HOST" envDefault:"smtp.gmail.com"`
 	SmtpPort     string `env:"SMTP_PORT" envDefault:"587"`
 	SmtpEmail    string `env:"SMTP_EMAIL" envDefault:""`

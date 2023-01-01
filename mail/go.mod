@@ -5,6 +5,7 @@ go 1.19
 require (
 	github.com/caarlos0/env v3.5.0+incompatible
 	github.com/joho/godotenv v1.4.0
+	github.com/rabbitmq/amqp091-go v1.5.0
 	github.com/rs/zerolog v1.28.0
 )
 

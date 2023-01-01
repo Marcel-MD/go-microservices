@@ -14,7 +14,8 @@ type Config struct {
 	ApiSecret     string        `env:"API_SECRET" envDefault:"SecretSecretSecret"`
 	TokenLifespan time.Duration `env:"TOKEN_LIFESPAN" envDefault:"24h"`
 
-	DatabaseUrl string `env:"DATABASE_URL" envDefault:"postgres://postgres:password@localhost:5432/users"`
+	RabbitMQUrl string `env:"RABBITMQ_URL" envDefault:"amqp://guest:guest@rabbitmq:5672/"`
+	DatabaseUrl string `env:"DATABASE_URL" envDefault:"postgres://postgres:password@postgres:5432/users"`
 }
 
 var once sync.Once

@@ -6,6 +6,7 @@ import (
 	"syscall"
 	"user/repositories"
 	"user/rpc"
+	"user/services"
 
 	"github.com/rs/zerolog/log"
 )
@@ -33,8 +34,12 @@ func main() {
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to get database connection")
 	}
-
 	dbSql.Close()
+
+	ms := services.GetMailService()
+	if err := ms.Close(); err != nil {
+		log.Fatal().Err(err).Msg("Failed to close mail service")
+	}
 
 	log.Info().Msg("Server exiting")
 }
