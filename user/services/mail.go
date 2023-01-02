@@ -9,8 +9,8 @@ import (
 	"user/config"
 	"user/models"
 
-	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/rs/zerolog/log"
+	"github.com/wagslane/go-rabbitmq"
 )
 
 type IMailService interface {
@@ -22,9 +22,8 @@ type IMailService interface {
 }
 
 type mailService struct {
-	conn  *amqp.Connection
-	ch    *amqp.Channel
-	queue amqp.Queue
+	conn      *rabbitmq.Conn
+	publisher *rabbitmq.Publisher
 }
 
 var mailOnce sync.Once
@@ -38,32 +37,37 @@ func GetMailService() IMailService {
 
 		cfg := config.GetConfig()
 
-		conn, err := amqp.Dial(cfg.RabbitMQUrl)
+		const retries = 5
+		var conn *rabbitmq.Conn
+		var err error
+
+		for i := 0; i < retries; i++ {
+			conn, err = rabbitmq.NewConn(
+				cfg.RabbitMQUrl,
+				rabbitmq.WithConnectionOptionsLogging,
+			)
+			if err != nil {
+				log.Warn().Err(err).Msg("Failed to connect to RabbitMQ, retrying in 3 seconds...")
+				time.Sleep(3 * time.Second)
+			} else {
+				break
+			}
+		}
 		if err != nil {
 			log.Fatal().Err(err).Msg("Failed to connect to RabbitMQ")
 		}
 
-		ch, err := conn.Channel()
-		if err != nil {
-			log.Fatal().Err(err).Msg("Failed to open a channel")
-		}
-
-		q, err := ch.QueueDeclare(
-			queueName, // name
-			true,      // durable
-			false,     // delete when unused
-			false,     // exclusive
-			false,     // no-wait
-			nil,       // arguments
+		publisher, err := rabbitmq.NewPublisher(
+			conn,
+			rabbitmq.WithPublisherOptionsLogging,
 		)
 		if err != nil {
-			log.Fatal().Err(err).Msg("Failed to declare a queue")
+			log.Fatal().Err(err).Msg("Failed to create publisher")
 		}
 
 		mailSrv = &mailService{
-			conn:  conn,
-			ch:    ch,
-			queue: q,
+			conn:      conn,
+			publisher: publisher,
 		}
 	})
 
@@ -71,11 +75,7 @@ func GetMailService() IMailService {
 }
 
 func (s *mailService) Close() error {
-	err := s.ch.Close()
-	if err != nil {
-		return err
-	}
-
+	s.publisher.Close()
 	return s.conn.Close()
 }
 
@@ -85,19 +85,11 @@ func (s *mailService) Send(ctx context.Context, mail models.Mail) error {
 		return err
 	}
 
-	err = s.ch.PublishWithContext(
-		ctx,
-		"",           // exchange
-		s.queue.Name, // routing key
-		false,        // mandatory
-		false,        // immediate
-		amqp.Publishing{
-			ContentType: "application/json",
-			Body:        body,
-		},
+	return s.publisher.Publish(
+		body,
+		[]string{queueName},
+		rabbitmq.WithPublishOptionsContentType("application/json"),
 	)
-
-	return err
 }
 
 func (s *mailService) SendAsync(mail models.Mail) {

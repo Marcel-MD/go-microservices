@@ -9,8 +9,8 @@ require (
 	github.com/golang/protobuf v1.5.2
 	github.com/google/uuid v1.3.0
 	github.com/joho/godotenv v1.4.0
-	github.com/rabbitmq/amqp091-go v1.5.0
 	github.com/rs/zerolog v1.15.0
+	github.com/wagslane/go-rabbitmq v0.11.1
 	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa
 	google.golang.org/grpc v1.51.0
 	google.golang.org/protobuf v1.28.1
@@ -40,6 +40,7 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180228061459-e0a39a4cb421 // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.6 // indirect
+	github.com/rabbitmq/amqp091-go v1.5.0 // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect
 	golang.org/x/net v0.4.0 // indirect
 	golang.org/x/sys v0.3.0 // indirect
