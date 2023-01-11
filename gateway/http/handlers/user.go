@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"gateway/dto"
+	"gateway/models"
 	"gateway/services"
 	"net/http"
 	"sync"
@@ -36,14 +36,14 @@ func GetUserHandler() IUserHandler {
 
 func (h *userHandler) Register(c *gin.Context) {
 
-	var dto dto.RegisterUser
-	err := c.ShouldBindJSON(&dto)
+	var model models.RegisterUser
+	err := c.ShouldBindJSON(&model)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	user, err := h.service.Register(c, dto)
+	user, err := h.service.Register(c, model)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -54,14 +54,14 @@ func (h *userHandler) Register(c *gin.Context) {
 
 func (h *userHandler) Login(c *gin.Context) {
 
-	var dto dto.LoginUser
-	err := c.ShouldBindJSON(&dto)
+	var model models.LoginUser
+	err := c.ShouldBindJSON(&model)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	token, err := h.service.Login(c, dto)
+	token, err := h.service.Login(c, model)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

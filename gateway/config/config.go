@@ -15,7 +15,7 @@ type Config struct {
 	TokenLifespan time.Duration `env:"TOKEN_LIFESPAN" envDefault:"24h"`
 
 	AllowOrigin    string `env:"ALLOW_ORIGIN" envDefault:"*"`
-	UserServiceUrl string `env:"USER_SERVICE_URL" envDefault:"localhost:8081"`
+	UserServiceUrl string `env:"USER_SERVICE_URL" envDefault:"user:8081"`
 }
 
 var once sync.Once
