@@ -19,6 +19,11 @@ type RegisterUser struct {
 	Password  string `json:"password" binding:"required,min=8,max=50"`
 }
 
+type RegisterOtpUser struct {
+	RegisterUser
+	Otp string `json:"otp" binding:"required,min=6,max=6"`
+}
+
 type LoginUser struct {
 	Email    string `json:"email" binding:"required,email"`
 	Password string `json:"password" binding:"required,min=8,max=50"`

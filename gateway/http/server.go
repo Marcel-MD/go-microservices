@@ -49,6 +49,9 @@ func routeUserHandler(router *gin.RouterGroup, cfg config.Config) {
 	r.GET("/", h.GetAll)
 	r.GET("/:id", h.GetById)
 
+	r.POST("/otp/:email", h.SendOtp)
+	r.POST("/register-otp", h.RegisterOtp)
+
 	p := r.Use(middleware.JwtAuth(cfg.ApiSecret))
 	p.GET("/current", h.Current)
 }

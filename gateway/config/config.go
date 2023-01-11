@@ -14,8 +14,10 @@ type Config struct {
 	ApiSecret     string        `env:"API_SECRET" envDefault:"SecretSecretSecret"`
 	TokenLifespan time.Duration `env:"TOKEN_LIFESPAN" envDefault:"24h"`
 
-	AllowOrigin    string `env:"ALLOW_ORIGIN" envDefault:"*"`
+	AllowOrigin string `env:"ALLOW_ORIGIN" envDefault:"*"`
+
 	UserServiceUrl string `env:"USER_SERVICE_URL" envDefault:"user:8081"`
+	MfaServiceUrl  string `env:"MFA_SERVICE_URL" envDefault:"mfa:8083"`
 }
 
 var once sync.Once
