@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package mfa;
+
+option go_package="./pb";
+
+service MfaService {
+    rpc GenerateOtp (GenerateOtpRequest) returns (OtpResponse) {}
+    rpc VerifyOtp (VerifyOtpRequest) returns (VerifyResponse) {}
+}
+
+message GenerateOtpRequest {
+    string email = 1;
+}
+
+message OtpResponse {
+    string otp = 1;
+}
+
+message VerifyOtpRequest {
+    string email = 1;
+    string otp = 2;
+}
+
+message VerifyResponse {
+    bool isValid = 1;
+}
