@@ -15,3 +15,7 @@ $ docker compose up
 ```
 
 You might have to run this command twice if it doesn't work the first time :)
+
+## High Level Architecture
+
+![Diagram](https://github.com/Marcel-MD/go-microservices/blob/main/diagram.png)
