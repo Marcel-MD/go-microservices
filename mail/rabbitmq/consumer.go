@@ -22,8 +22,10 @@ type consumer struct {
 	mailService services.IMailService
 }
 
-var consumerOnce sync.Once
-var consume IConsumer
+var (
+	consumerOnce sync.Once
+	consume      IConsumer
+)
 
 const queueName = "mail"
 

@@ -25,8 +25,10 @@ type userService struct {
 	cfg        config.Config
 }
 
-var userOnce sync.Once
-var userSrv IUserService
+var (
+	userOnce sync.Once
+	userSrv  IUserService
+)
 
 func GetUserService() IUserService {
 	userOnce.Do(func() {

@@ -10,8 +10,10 @@ import (
 	"gorm.io/gorm"
 )
 
-var dbOnce sync.Once
-var database *gorm.DB
+var (
+	dbOnce   sync.Once
+	database *gorm.DB
+)
 
 func GetDB() *gorm.DB {
 	dbOnce.Do(func() {
@@ -33,7 +35,7 @@ func GetDB() *gorm.DB {
 	return database
 }
 
-func Paginate(page int, size int) func(db *gorm.DB) *gorm.DB {
+func Paginate(page, size int) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		switch {
 		case size > 100:

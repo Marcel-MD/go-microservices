@@ -26,8 +26,10 @@ type mailService struct {
 	publisher *rabbitmq.Publisher
 }
 
-var mailOnce sync.Once
-var mailSrv IMailService
+var (
+	mailOnce sync.Once
+	mailSrv  IMailService
+)
 
 const queueName = "mail"
 

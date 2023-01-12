@@ -21,8 +21,10 @@ type otpService struct {
 	repository repositories.IOtpRepository
 }
 
-var otpOnce sync.Once
-var otpSrv IOtpService
+var (
+	otpOnce sync.Once
+	otpSrv  IOtpService
+)
 
 func GetOtpService() IOtpService {
 	otpOnce.Do(func() {

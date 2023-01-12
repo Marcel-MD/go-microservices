@@ -15,9 +15,11 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-var once sync.Once
-var srv *grpc.Server
-var listener net.Listener
+var (
+	once     sync.Once
+	srv      *grpc.Server
+	listener net.Listener
+)
 
 func GetServer() (*grpc.Server, net.Listener) {
 	once.Do(func() {

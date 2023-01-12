@@ -25,8 +25,10 @@ type userHandler struct {
 	mfaService  services.IMfaService
 }
 
-var userOnce sync.Once
-var userHnd IUserHandler
+var (
+	userOnce sync.Once
+	userHnd  IUserHandler
+)
 
 func GetUserHandler() IUserHandler {
 	userOnce.Do(func() {

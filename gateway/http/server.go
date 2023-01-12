@@ -11,8 +11,10 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-var once sync.Once
-var srv *http.Server
+var (
+	once sync.Once
+	srv  *http.Server
+)
 
 func GetServer() *http.Server {
 	once.Do(func() {

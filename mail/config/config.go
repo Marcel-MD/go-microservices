@@ -20,8 +20,10 @@ type Config struct {
 	SenderName   string `env:"SENDER_NAME" envDefault:""`
 }
 
-var once sync.Once
-var cfg Config
+var (
+	once sync.Once
+	cfg  Config
+)
 
 func GetConfig() Config {
 	once.Do(func() {

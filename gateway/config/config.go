@@ -20,8 +20,10 @@ type Config struct {
 	MfaServiceUrl  string `env:"MFA_SERVICE_URL" envDefault:"mfa:8083"`
 }
 
-var once sync.Once
-var cfg Config
+var (
+	once sync.Once
+	cfg  Config
+)
 
 func GetConfig() Config {
 	once.Do(func() {

@@ -18,8 +18,10 @@ type Config struct {
 	DatabaseUrl string `env:"DATABASE_URL" envDefault:"postgres://postgres:password@postgres:5432/users"`
 }
 
-var once sync.Once
-var cfg Config
+var (
+	once sync.Once
+	cfg  Config
+)
 
 func GetConfig() Config {
 	once.Do(func() {

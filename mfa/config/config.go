@@ -18,8 +18,10 @@ type Config struct {
 	RedisUrl    string `env:"REDIS_URL" envDefault:"redis://:password@redis:6379/0"`
 }
 
-var once sync.Once
-var cfg Config
+var (
+	once sync.Once
+	cfg  Config
+)
 
 func GetConfig() Config {
 	once.Do(func() {
