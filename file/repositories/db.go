@@ -21,7 +21,6 @@ var (
 
 func GetDB() *mongo.Database {
 	dbOnce.Do(func() {
-
 		log.Info().Msg("Initializing database")
 
 		cfg := config.GetConfig()

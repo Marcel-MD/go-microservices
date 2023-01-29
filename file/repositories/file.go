@@ -5,12 +5,13 @@ import (
 	"file/models"
 	"sync"
 
+	"github.com/rs/zerolog/log"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type IFileRepository interface {
-	FindById(ctx context.Context, id string) (models.File, error)
+	FindByName(ctx context.Context, name string) (models.File, error)
 	FindAll(ctx context.Context) ([]models.File, error)
 	FindByOwnerId(ctx context.Context, ownerId string) ([]models.File, error)
 	Create(ctx context.Context, file *models.File) error
@@ -27,6 +28,8 @@ var fileRepo IFileRepository
 
 func GetFileRepository() IFileRepository {
 	fileOnce.Do(func() {
+		log.Info().Msg("Initializing file repository")
+
 		repo := fileRepository{
 			db: GetDB(),
 		}
@@ -39,9 +42,9 @@ func GetFileRepository() IFileRepository {
 	return fileRepo
 }
 
-func (r *fileRepository) FindById(ctx context.Context, id string) (models.File, error) {
+func (r *fileRepository) FindByName(ctx context.Context, name string) (models.File, error) {
 	var file models.File
-	err := r.coll.FindOne(ctx, bson.M{"_id": id}).Decode(&file)
+	err := r.coll.FindOne(ctx, bson.M{"name": name}).Decode(&file)
 	if err != nil {
 		return file, err
 	}
@@ -89,7 +92,7 @@ func (r *fileRepository) Create(ctx context.Context, file *models.File) error {
 }
 
 func (r *fileRepository) Delete(ctx context.Context, file *models.File) error {
-	_, err := r.coll.DeleteOne(ctx, bson.M{"_id": file.Id})
+	_, err := r.coll.DeleteOne(ctx, bson.M{"name": file.Name})
 	if err != nil {
 		return err
 	}

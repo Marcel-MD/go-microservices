@@ -12,6 +12,11 @@ type Config struct {
 	Port string `env:"PORT" envDefault:":8084"`
 
 	DatabaseUrl string `env:"DATABASE_URL" envDefault:"mongodb://root:password@mongo:27017"`
+
+	AzureEndpoint  string `env:"AZURE_ENDPOINT" envDefault:"http://localhost:10000"`
+	AzureName      string `env:"AZURE_NAME" envDefault:"devstoreaccount1"`
+	AzureKey       string `env:"AZURE_KEY" envDefault:"Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="`
+	AzureContainer string `env:"AZURE_CONTAINER" envDefault:"files"`
 }
 
 var (
