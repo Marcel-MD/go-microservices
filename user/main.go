@@ -29,12 +29,9 @@ func main() {
 
 	srv.GracefulStop()
 
-	db := repositories.GetDB()
-	dbSql, err := db.DB()
-	if err != nil {
-		log.Fatal().Err(err).Msg("Failed to get database connection")
+	if err := repositories.CloseDB(); err != nil {
+		log.Fatal().Err(err).Msg("Failed to close db connection")
 	}
-	dbSql.Close()
 
 	ms := services.GetMailService()
 	if err := ms.Close(); err != nil {

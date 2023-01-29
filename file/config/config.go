@@ -10,6 +10,8 @@ import (
 
 type Config struct {
 	Port string `env:"PORT" envDefault:":8084"`
+
+	DatabaseUrl string `env:"DATABASE_URL" envDefault:"mongodb://root:password@mongo:27017"`
 }
 
 var (

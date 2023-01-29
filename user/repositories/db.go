@@ -35,6 +35,15 @@ func GetDB() *gorm.DB {
 	return database
 }
 
+func CloseDB() error {
+	dbSql, err := database.DB()
+	if err != nil {
+		return err
+	}
+
+	return dbSql.Close()
+}
+
 func Paginate(page, size int) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		switch {
