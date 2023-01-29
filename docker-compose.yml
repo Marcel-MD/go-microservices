@@ -64,7 +64,27 @@ services:
     ports:
       - "8080:8080"
 
+  mongo:
+    image: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-db:/data/db
+
+  file:
+    build:
+      context: ./file
+      dockerfile: Dockerfile
+    depends_on:
+      - mongo
+    ports:
+      - "8084:8084"
+
 volumes:
   rabbitmq_data:
   rabbitmq_log:
   postgres-db:
+  mongo-db:
