@@ -2,6 +2,7 @@ package config
 
 import (
 	"sync"
+	"time"
 
 	"github.com/caarlos0/env"
 	"github.com/joho/godotenv"
@@ -9,9 +10,13 @@ import (
 )
 
 type Config struct {
-	Port string `env:"PORT" envDefault:":8084"`
+	Port          string        `env:"PORT" envDefault:":8084"`
+	ApiSecret     string        `env:"API_SECRET" envDefault:"SecretSecretSecret"`
+	TokenLifespan time.Duration `env:"TOKEN_LIFESPAN" envDefault:"24h"`
 
-	DatabaseUrl string `env:"DATABASE_URL" envDefault:"mongodb://root:password@mongo:27017"`
+	AllowOrigin string `env:"ALLOW_ORIGIN" envDefault:"*"`
+
+	DatabaseUrl string `env:"DATABASE_URL" envDefault:"mongodb://root:password@localhost:27017"`
 
 	AzureEndpoint  string `env:"AZURE_ENDPOINT" envDefault:"http://localhost:10000"`
 	AzureName      string `env:"AZURE_NAME" envDefault:"devstoreaccount1"`

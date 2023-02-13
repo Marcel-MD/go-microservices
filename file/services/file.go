@@ -8,6 +8,7 @@ import (
 	"io"
 	"sync"
 
+	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 )
 
@@ -16,9 +17,9 @@ type IFileService interface {
 	FindByName(ctx context.Context, name string) (models.File, error)
 	FindByOwnerId(ctx context.Context, ownerId string) ([]models.File, error)
 
-	Upload(ctx context.Context, reader io.Reader, name, ownerId string) (models.File, error)
+	Upload(ctx context.Context, reader io.Reader, ownerId string) (models.File, error)
 	Read(ctx context.Context, name string) (io.Reader, error)
-	Delete(ctx context.Context, name string) error
+	Delete(ctx context.Context, name, ownerId string) error
 }
 
 type fileService struct {
@@ -62,15 +63,13 @@ func (s *fileService) FindByOwnerId(ctx context.Context, ownerId string) ([]mode
 	return s.fileRepository.FindByOwnerId(ctx, ownerId)
 }
 
-func (s *fileService) Upload(ctx context.Context, reader io.Reader, name, ownerId string) (models.File, error) {
-	log.Debug().Str("name", name).Str("ownerId", ownerId).Msg("Uploading file")
+func (s *fileService) Upload(ctx context.Context, reader io.Reader, ownerId string) (models.File, error) {
+	log.Debug().Str("ownerId", ownerId).Msg("Uploading file")
 
-	file, err := s.fileRepository.FindByName(ctx, name)
-	if err == nil {
-		return file, errors.New("file already exists")
-	}
+	var file models.File
+	name := uuid.New().String()
 
-	name, err = s.blobRepository.Upload(ctx, name, reader)
+	name, err := s.blobRepository.Upload(ctx, name, reader)
 	if err != nil {
 		return file, err
 	}
@@ -94,12 +93,16 @@ func (s *fileService) Read(ctx context.Context, name string) (io.Reader, error) 
 	return s.blobRepository.Get(ctx, name)
 }
 
-func (s *fileService) Delete(ctx context.Context, name string) error {
+func (s *fileService) Delete(ctx context.Context, name, ownerId string) error {
 	log.Debug().Str("name", name).Msg("Deleting file")
 
 	file, err := s.fileRepository.FindByName(ctx, name)
 	if err != nil {
 		return err
+	}
+
+	if file.OwnerId != ownerId {
+		return errors.New("file does not belong to user")
 	}
 
 	err = s.fileRepository.Delete(ctx, &file)
