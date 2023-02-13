@@ -89,6 +89,7 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - mongo
+      - azurite
     ports:
       - "8084:8084"
 
