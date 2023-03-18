@@ -8,7 +8,6 @@ import (
 	"io"
 	"sync"
 
-	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 )
 
@@ -17,7 +16,7 @@ type IFileService interface {
 	FindByName(ctx context.Context, name string) (models.File, error)
 	FindByOwnerId(ctx context.Context, ownerId string) ([]models.File, error)
 
-	Upload(ctx context.Context, reader io.Reader, ownerId string) (models.File, error)
+	Upload(ctx context.Context, reader io.Reader, extension string, ownerId string) (models.File, error)
 	Read(ctx context.Context, name string) (io.Reader, error)
 	Delete(ctx context.Context, name, ownerId string) error
 }
@@ -63,20 +62,20 @@ func (s *fileService) FindByOwnerId(ctx context.Context, ownerId string) ([]mode
 	return s.fileRepository.FindByOwnerId(ctx, ownerId)
 }
 
-func (s *fileService) Upload(ctx context.Context, reader io.Reader, ownerId string) (models.File, error) {
+func (s *fileService) Upload(ctx context.Context, reader io.Reader, extension string, ownerId string) (models.File, error) {
 	log.Debug().Str("ownerId", ownerId).Msg("Uploading file")
 
 	var file models.File
-	name := uuid.New().String()
 
-	name, err := s.blobRepository.Upload(ctx, name, reader)
+	name, err := s.blobRepository.Upload(ctx, extension, reader)
 	if err != nil {
 		return file, err
 	}
 
 	file = models.File{
-		Name:    name,
-		OwnerId: ownerId,
+		Name:      name,
+		OwnerId:   ownerId,
+		Extension: extension,
 	}
 
 	err = s.fileRepository.Create(ctx, &file)
@@ -90,7 +89,7 @@ func (s *fileService) Upload(ctx context.Context, reader io.Reader, ownerId stri
 func (s *fileService) Read(ctx context.Context, name string) (io.Reader, error) {
 	log.Debug().Str("name", name).Msg("Reading file")
 
-	return s.blobRepository.Get(ctx, name)
+	return s.blobRepository.Download(ctx, name)
 }
 
 func (s *fileService) Delete(ctx context.Context, name, ownerId string) error {

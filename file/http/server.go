@@ -47,11 +47,11 @@ func routeUserHandler(router *gin.RouterGroup, cfg config.Config) {
 
 	r := router.Group("/files")
 	r.GET("/", h.GetAll)
-	r.GET("/owner/:id", h.GetByOwnerId)
-	r.GET("/:name", h.GetByName)
-	r.GET("/read/:name", h.Read)
+	r.GET("/owner/:owner-id", h.GetByOwnerId)
+	r.GET("/:file-name", h.GetByName)
+	r.GET("/read/:file-name", h.Read)
 
 	p := r.Use(middleware.JwtAuth(cfg.ApiSecret))
 	p.POST("/", h.Upload)
-	p.DELETE("/:name", h.Delete)
+	p.DELETE("/:file-name", h.Delete)
 }

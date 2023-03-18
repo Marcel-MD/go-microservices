@@ -3,23 +3,23 @@ package repositories
 import (
 	"context"
 	"file/config"
-	"fmt"
 	"io"
-	"net/url"
 	"sync"
 
-	"github.com/Azure/azure-storage-blob-go/azblob"
+	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
+	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 )
 
 type IBlobRepository interface {
-	Get(ctx context.Context, fileName string) (io.Reader, error)
-	Upload(ctx context.Context, fileName string, reader io.Reader) (string, error)
-	Delete(ctx context.Context, fileName string) error
+	Download(ctx context.Context, name string) (io.Reader, error)
+	Upload(ctx context.Context, extension string, reader io.Reader) (string, error)
+	Delete(ctx context.Context, name string) error
 }
 
 type blobRepository struct {
-	containerUrl azblob.ContainerURL
+	client    *azblob.Client
+	container string
 }
 
 var (
@@ -29,55 +29,61 @@ var (
 
 func GetBlobRepository() IBlobRepository {
 	blobOnce.Do(func() {
-		log.Info().Msg("Initializing blob service")
+		log.Info().Msg("Initializing blob repository")
 
 		cfg := config.GetConfig()
 
-		credential, err := azblob.NewSharedKeyCredential(cfg.AzureName, cfg.AzureKey)
+		client, err := azblob.NewClientFromConnectionString(cfg.AzureBlobConnectionString, nil)
 		if err != nil {
-			log.Fatal().Err(err).Msg("Invalid credentials with error")
-		}
-		pipeline := azblob.NewPipeline(credential, azblob.PipelineOptions{})
-
-		URL, err := url.Parse(fmt.Sprintf("%s/%s", cfg.AzureEndpoint, cfg.AzureContainer))
-		if err != nil {
-			log.Fatal().Err(err).Msg("Invalid URL with error")
+			log.Fatal().Err(err).Msg("Failed to initialize blob repository")
 		}
 
-		containerURL := azblob.NewContainerURL(*URL, pipeline)
+		_, err = client.CreateContainer(context.Background(), cfg.AzureBlobContainerName, nil)
+		if err != nil {
+			log.Warn().Err(err).Msg("Failed to create container, it may already exist")
+		}
 
 		blobRepo = &blobRepository{
-			containerUrl: containerURL,
+			client:    client,
+			container: cfg.AzureBlobContainerName,
 		}
 	})
 
 	return blobRepo
 }
 
-func (r *blobRepository) Get(ctx context.Context, fileName string) (io.Reader, error) {
-	blobUrl := r.containerUrl.NewBlockBlobURL(fileName)
-	downloadResponse, err := blobUrl.Download(ctx, 0, azblob.CountToEnd, azblob.BlobAccessConditions{}, false, azblob.ClientProvidedKeyOptions{})
-	if err != nil {
-		return nil, err
-	}
+func (b *blobRepository) Upload(ctx context.Context, extension string, reader io.Reader) (string, error) {
+	log.Debug().Msg("Uploading blob")
 
-	return downloadResponse.Body(azblob.RetryReaderOptions{}), nil
-}
+	name := uuid.New().String() + extension
 
-func (r *blobRepository) Upload(ctx context.Context, fileName string, reader io.Reader) (string, error) {
-	blobUrl := r.containerUrl.NewBlockBlobURL(fileName)
-	_, err := azblob.UploadStreamToBlockBlob(ctx, reader, blobUrl, azblob.UploadStreamToBlockBlobOptions{})
+	_, err := b.client.UploadStream(ctx, b.container, name, reader, nil)
 	if err != nil {
+		log.Error().Err(err).Msg("Failed to upload blob")
 		return "", err
 	}
 
-	return fileName, nil
+	return name, nil
 }
 
-func (r *blobRepository) Delete(ctx context.Context, fileName string) error {
-	blobUrl := r.containerUrl.NewBlockBlobURL(fileName)
-	_, err := blobUrl.Delete(ctx, azblob.DeleteSnapshotsOptionInclude, azblob.BlobAccessConditions{})
+func (b *blobRepository) Download(ctx context.Context, name string) (io.Reader, error) {
+	log.Debug().Msg("Getting blob")
+
+	rsp, err := b.client.DownloadStream(ctx, b.container, name, nil)
 	if err != nil {
+		log.Error().Err(err).Msg("Failed to get blob")
+		return nil, err
+	}
+
+	return rsp.Body, nil
+}
+
+func (b *blobRepository) Delete(ctx context.Context, name string) error {
+	log.Debug().Msg("Deleting blob")
+
+	_, err := b.client.DeleteBlob(ctx, b.container, name, nil)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to delete blob")
 		return err
 	}
 

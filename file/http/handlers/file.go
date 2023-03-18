@@ -2,7 +2,9 @@ package handlers
 
 import (
 	"file/services"
+	"mime"
 	"net/http"
+	"path"
 	"sync"
 
 	"github.com/gin-gonic/gin"
@@ -72,26 +74,31 @@ func (h *fileHandler) Read(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	c.DataFromReader(http.StatusOK, -1, "application/octet-stream", reader, nil)
+
+	mimeType := mime.TypeByExtension(path.Ext(fileName))
+	c.DataFromReader(http.StatusOK, -1, mimeType, reader, nil)
 }
 
 func (h *fileHandler) Upload(c *gin.Context) {
 	userId := c.GetString("user_id")
 
-	file, _, err := c.Request.FormFile("file")
+	file, header, err := c.Request.FormFile("file")
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	defer file.Close()
 
-	url, err := h.fileService.Upload(c, file, userId)
+	name := header.Filename
+	extension := path.Ext(name)
+
+	newFile, err := h.fileService.Upload(c, file, extension, userId)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"url": url})
+	c.JSON(http.StatusOK, newFile)
 }
 
 func (h *fileHandler) Delete(c *gin.Context) {

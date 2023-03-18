@@ -18,10 +18,8 @@ type Config struct {
 
 	DatabaseUrl string `env:"DATABASE_URL" envDefault:"mongodb://root:password@mongo:27017"`
 
-	AzureEndpoint  string `env:"AZURE_ENDPOINT" envDefault:"http://azurite:10000"`
-	AzureName      string `env:"AZURE_NAME" envDefault:"devstoreaccount1"`
-	AzureKey       string `env:"AZURE_KEY" envDefault:"Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="`
-	AzureContainer string `env:"AZURE_CONTAINER" envDefault:"files"`
+	AzureBlobConnectionString string `env:"AZURE_BLOB_CONNECTION_STRING" envDefault:"AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;DefaultEndpointsProtocol=http;BlobEndpoint=http://azurite:10000/devstoreaccount1;QueueEndpoint=http://azurite:10001/devstoreaccount1;TableEndpoint=http://azurite:10002/devstoreaccount1;"`
+	AzureBlobContainerName    string `env:"AZURE_BLOB_CONTAINER_NAME" envDefault:"files"`
 }
 
 var (
