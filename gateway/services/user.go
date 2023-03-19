@@ -13,7 +13,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-type IUserService interface {
+type UserService interface {
 	Close() error
 	Get(ctx context.Context, id string) (models.User, error)
 	List(ctx context.Context) ([]models.User, error)
@@ -28,10 +28,10 @@ type userService struct {
 
 var (
 	userOnce sync.Once
-	userSrv  IUserService
+	userSrv  UserService
 )
 
-func GetUserService() IUserService {
+func GetUserService() UserService {
 	userOnce.Do(func() {
 		cfg := config.GetConfig()
 

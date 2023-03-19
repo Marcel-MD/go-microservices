@@ -49,8 +49,8 @@ func GetServer() (*grpc.Server, net.Listener) {
 
 type server struct {
 	pb.UserServiceServer
-	userService services.IUserService
-	mailService services.IMailService
+	userService services.UserService
+	mailService services.MailService
 }
 
 func (s *server) Register(ctx context.Context, in *pb.RegisterRequest) (*pb.UserId, error) {

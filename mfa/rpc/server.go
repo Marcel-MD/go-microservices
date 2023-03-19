@@ -46,8 +46,8 @@ func GetServer() (*grpc.Server, net.Listener) {
 
 type server struct {
 	pb.MfaServiceServer
-	userService services.IOtpService
-	mailService services.IMailService
+	userService services.OtpService
+	mailService services.MailService
 }
 
 func (s *server) GenerateOtp(ctx context.Context, in *pb.GenerateOtpRequest) (*pb.OtpResponse, error) {

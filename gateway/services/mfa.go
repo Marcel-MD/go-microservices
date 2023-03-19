@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-type IMfaService interface {
+type MfaService interface {
 	GenerateOtp(ctx context.Context, email string) (string, error)
 	VerifyOtp(ctx context.Context, email string, otp string) (bool, error)
 }
@@ -23,10 +23,10 @@ type mfaService struct {
 
 var (
 	mfaOnce sync.Once
-	mfaSrv  IMfaService
+	mfaSrv  MfaService
 )
 
-func GetMfaService() IMfaService {
+func GetMfaService() MfaService {
 	mfaOnce.Do(func() {
 		cfg := config.GetConfig()
 

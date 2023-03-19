@@ -70,7 +70,7 @@ func TestLogin(t *testing.T) {
 	}
 }
 
-func getUserService() IUserService {
+func getUserService() UserService {
 	return &userService{
 		repository: &userRepositoryMock{
 			store: make(map[string]models.User),

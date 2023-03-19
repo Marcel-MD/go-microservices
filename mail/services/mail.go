@@ -11,7 +11,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-type IMailService interface {
+type MailService interface {
 	Send(mail models.Mail)
 }
 
@@ -24,10 +24,10 @@ type mailService struct {
 
 var (
 	mailOnce sync.Once
-	mailSrv  IMailService
+	mailSrv  MailService
 )
 
-func GetMailService() IMailService {
+func GetMailService() MailService {
 	mailOnce.Do(func() {
 		log.Info().Msg("Initializing mail service")
 

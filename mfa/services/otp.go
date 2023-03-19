@@ -11,22 +11,22 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-type IOtpService interface {
+type OtpService interface {
 	Generate(ctx context.Context, email string) (string, error)
 	Verify(ctx context.Context, email, otp string) (bool, error)
 }
 
 type otpService struct {
 	cfg        config.Config
-	repository repositories.IOtpRepository
+	repository repositories.OtpRepository
 }
 
 var (
 	otpOnce sync.Once
-	otpSrv  IOtpService
+	otpSrv  OtpService
 )
 
-func GetOtpService() IOtpService {
+func GetOtpService() OtpService {
 	otpOnce.Do(func() {
 		log.Info().Msg("Initializing otp service")
 

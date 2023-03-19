@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type IUserRepository interface {
+type UserRepository interface {
 	FindAll() []models.User
 	FindById(id string) (models.User, error)
 	FindByEmail(email string) (models.User, error)
@@ -23,10 +23,10 @@ type userRepository struct {
 
 var (
 	userOnce sync.Once
-	userRepo IUserRepository
+	userRepo UserRepository
 )
 
-func GetUserRepository() IUserRepository {
+func GetUserRepository() UserRepository {
 	userOnce.Do(func() {
 		log.Info().Msg("Initializing user repository")
 		userRepo = &userRepository{

@@ -9,7 +9,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-type IOtpRepository interface {
+type OtpRepository interface {
 	Set(ctx context.Context, key string, otp string, expiry time.Duration) error
 	Get(ctx context.Context, key string) (string, error)
 }
@@ -20,10 +20,10 @@ type otpRepository struct {
 
 var (
 	otpOnce sync.Once
-	otpRepo IOtpRepository
+	otpRepo OtpRepository
 )
 
-func GetOtpRepository() IOtpRepository {
+func GetOtpRepository() OtpRepository {
 
 	otpOnce.Do(func() {
 		log.Info().Msg("Initializing otp repository")

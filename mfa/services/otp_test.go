@@ -49,7 +49,7 @@ func TestGenerateDifferentOtp(t *testing.T) {
 	}
 }
 
-func getOtpService() IOtpService {
+func getOtpService() OtpService {
 	return &otpService{
 		cfg: config.Config{
 			OtpExpiry: 10 * time.Minute,

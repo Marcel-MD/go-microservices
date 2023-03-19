@@ -13,7 +13,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type IUserService interface {
+type UserService interface {
 	FindAll() []models.User
 	FindOne(id string) (models.User, error)
 	Register(user models.User) (models.User, error)
@@ -21,16 +21,16 @@ type IUserService interface {
 }
 
 type userService struct {
-	repository repositories.IUserRepository
+	repository repositories.UserRepository
 	cfg        config.Config
 }
 
 var (
 	userOnce sync.Once
-	userSrv  IUserService
+	userSrv  UserService
 )
 
-func GetUserService() IUserService {
+func GetUserService() UserService {
 	userOnce.Do(func() {
 		log.Info().Msg("Initializing user service")
 

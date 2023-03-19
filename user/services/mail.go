@@ -13,7 +13,7 @@ import (
 	"github.com/wagslane/go-rabbitmq"
 )
 
-type IMailService interface {
+type MailService interface {
 	Send(ctx context.Context, mail models.Mail) error
 	SendAsync(mail models.Mail)
 	Close() error
@@ -28,12 +28,12 @@ type mailService struct {
 
 var (
 	mailOnce sync.Once
-	mailSrv  IMailService
+	mailSrv  MailService
 )
 
 const queueName = "mail"
 
-func GetMailService() IMailService {
+func GetMailService() MailService {
 	mailOnce.Do(func() {
 		log.Info().Msg("Initializing mail service")
 

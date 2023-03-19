@@ -21,8 +21,8 @@ type IUserHandler interface {
 }
 
 type userHandler struct {
-	userService services.IUserService
-	mfaService  services.IMfaService
+	userService services.UserService
+	mfaService  services.MfaService
 }
 
 var (

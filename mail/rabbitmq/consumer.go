@@ -12,24 +12,24 @@ import (
 	"github.com/wagslane/go-rabbitmq"
 )
 
-type IConsumer interface {
+type Consumer interface {
 	Close() error
 }
 
 type consumer struct {
 	conn        *rabbitmq.Conn
 	consumer    *rabbitmq.Consumer
-	mailService services.IMailService
+	mailService services.MailService
 }
 
 var (
 	consumerOnce sync.Once
-	consume      IConsumer
+	consume      Consumer
 )
 
 const queueName = "mail"
 
-func GetConsumer() IConsumer {
+func GetConsumer() Consumer {
 	consumerOnce.Do(func() {
 		log.Info().Msg("Initializing consumer")
 
