@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"sync"
 
+	"github.com/Depado/ginprom"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 )
@@ -26,6 +27,13 @@ func GetServer() *http.Server {
 		e := gin.Default()
 
 		e.Use(middleware.CORS(cfg.AllowOrigin))
+
+		p := ginprom.New(
+			ginprom.Engine(e),
+			ginprom.Subsystem("gateway"),
+			ginprom.Path("/metrics"),
+		)
+		e.Use(p.Instrument())
 
 		r := e.Group("/api")
 
