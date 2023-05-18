@@ -11,7 +11,7 @@ service UserService {
     rpc Register (RegisterRequest) returns (UserId) {}
     rpc Login (LoginRequest) returns (Token) {}
     rpc Get (UserId) returns (User) {}
-    rpc List (google.protobuf.Empty) returns (UserList) {}
+    rpc GetAll (google.protobuf.Empty) returns (Users) {}
 }
 
 message RegisterRequest {
@@ -36,7 +36,7 @@ message User {
     google.protobuf.Timestamp updated_at = 6;
 }
 
-message UserList {
+message Users {
     repeated User users = 1;
 }
 

@@ -82,13 +82,13 @@ func (s *server) Login(ctx context.Context, in *pb.LoginRequest) (*pb.Token, err
 	return &pb.Token{Token: token}, nil
 }
 
-func (s *server) List(ctx context.Context, in *empty.Empty) (*pb.UserList, error) {
+func (s *server) GetAll(ctx context.Context, in *empty.Empty) (*pb.Users, error) {
 
 	users := s.userService.FindAll()
 
-	var userList []*pb.User
+	var pbUsers []*pb.User
 	for _, user := range users {
-		userList = append(userList, &pb.User{
+		pbUsers = append(pbUsers, &pb.User{
 			Id:        user.Id,
 			Email:     user.Email,
 			FirstName: user.FirstName,
@@ -98,7 +98,7 @@ func (s *server) List(ctx context.Context, in *empty.Empty) (*pb.UserList, error
 		})
 	}
 
-	return &pb.UserList{Users: userList}, nil
+	return &pb.Users{Users: pbUsers}, nil
 }
 
 func (s *server) Get(ctx context.Context, in *pb.UserId) (*pb.User, error) {

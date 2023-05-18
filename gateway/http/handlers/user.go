@@ -90,7 +90,7 @@ func (h *userHandler) GetById(c *gin.Context) {
 }
 
 func (h *userHandler) GetAll(c *gin.Context) {
-	users, err := h.userService.List(c)
+	users, err := h.userService.GetAll(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

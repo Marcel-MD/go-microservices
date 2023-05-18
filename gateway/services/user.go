@@ -16,7 +16,7 @@ import (
 type UserService interface {
 	Close() error
 	Get(ctx context.Context, id string) (models.User, error)
-	List(ctx context.Context) ([]models.User, error)
+	GetAll(ctx context.Context) ([]models.User, error)
 	Register(ctx context.Context, user models.RegisterUser) (string, error)
 	Login(ctx context.Context, user models.LoginUser) (string, error)
 }
@@ -71,8 +71,8 @@ func (s *userService) Get(ctx context.Context, id string) (models.User, error) {
 	}, nil
 }
 
-func (s *userService) List(ctx context.Context) ([]models.User, error) {
-	users, err := s.client.List(ctx, &emptypb.Empty{})
+func (s *userService) GetAll(ctx context.Context) ([]models.User, error) {
+	users, err := s.client.GetAll(ctx, &emptypb.Empty{})
 	if err != nil {
 		return nil, err
 	}
